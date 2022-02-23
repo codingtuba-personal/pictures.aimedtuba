@@ -3,6 +3,7 @@
     <div class="top">
       <router-link to="/settings" tag="a" v-if="!admin_panel">settings</router-link>
       <router-link to="/" tag="a" v-if="!admin_panel">home</router-link>
+      <router-link to="/support" tag="a" v-if="!admin_panel">support</router-link>
       <a class="admin" href="javascript:nothing" @click.prevent @click="admin_panel=!admin_panel" v-if="getCookie('admin')" :class="{'admin-active':admin_panel}">admin {{admin_panel?">":"<"}}</a>
       <span v-if="admin_panel" class="admin-pannel">
         <span v-if="pathname()=='/'">
@@ -109,7 +110,8 @@ export default {
           code:cookies.getCookie('code')
         }),
       }).then(()=>{
-        cookies.setCookie('account',_tuba.get('tuba-login'));
+        cookies.setCookie('account',_tuba.get('tuba-login'),99999);
+        cookies.setCookie('username',_tuba.get('tuba-username'),99999);
         location.replace(window.location.pathname)
       })
     }else if(!cookies.getCookie('account')){

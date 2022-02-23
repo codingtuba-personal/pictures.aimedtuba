@@ -180,8 +180,6 @@ export default {
         width:20px;
         height:20px;
         margin-left:5px;
-        border:lightgray 2px solid;
-        border-radius:5px;
     }
     input[type=checkbox]:before{
         content:"";

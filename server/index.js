@@ -14,11 +14,6 @@ let Schemas={
         images:[{
             url:String,
             name:String,
-            reactions:[{
-                _id:Schema.Types.ObjectId,
-                emoji:String,
-                number:Number,
-            }]
         }],
         comments:[{
             _id:Schema.Types.ObjectId,
@@ -48,11 +43,12 @@ let Schemas={
             username:String,
             login:String,
         },
-        login:String,
-    }),
-    reaction:new Schema({
-        emoji:String,
-        number:Number,
+        album:{
+            name:String,
+        },
+        set:{
+            name:String,
+        },
     }),
     users:new Schema({
         username:String,
@@ -76,7 +72,6 @@ let models={
     album:mongoose.model('albums',Schemas.album),
     set:mongoose.model('sets',Schemas.set),
     comment:mongoose.model('comments',Schemas.comment),
-    reaction:mongoose.model('reactions',Schemas.reaction),
     user:mongoose.model('users',Schemas.users),
 }
 
@@ -92,7 +87,6 @@ const databases={
             this.albums=mongoose.connection.db.collection('albums')
             this.sets=mongoose.connection.db.collection('sets')
             this.comments=mongoose.connection.db.collection('comments')
-            this.reactions=mongoose.connection.db.collection('reactions')
             this.users=mongoose.connection.db.collection('users')
             app.listen(1000)
         })
@@ -112,12 +106,94 @@ app.post('/admin',(req,res)=>{
     }else{res.sendStatus(406)}
 })
 
+// comments
+app.get("/comments",(req,res)=>{
+    if(req.query.code&&req.query.set&&req.query.album){
+        if(req.query.code==keys.codes.website){
+            models.comment.find({"album.name":req.query.album,"set.name":req.query.set},(err,comments)=>{
+                comments.forEach(comment=>{
+                    comment.user.login=null
+                })
+                if(err){console.log(err)}
+                else{
+                    res.json(comments)
+                }
+            })
+        }else{res.sendStatus(401)}
+    }else{res.sendStatus(406)}
+})
+app.post("/comment",(req,res)=>{
+    console.log(req.body)
+    if(req.body.codes&&req.body.content&&req.body.album&&req.body.set){
+        if(req.body.codes.login&&req.body.codes.website){
+            if(req.body.codes.website==keys.codes.website){
+                models.user.find({"login":req.body.codes.login},(err,user)=>{
+                    if(err){console.log(err);res.sendStatus(500)}
+                    else{
+                        if(user.length==1){
+                            models.comment.create({
+                                content:req.body.content,
+                                user:{
+                                    username:user[0].username,
+                                    login:req.body.codes.login,
+                                },
+                                album:{name:req.body.album},
+                                set:{name:req.body.set},
+                            },(err,comment)=>{
+                                models.album.findOneAndUpdate({"name":req.body.album},{$push:{comments:comment._id}},(err,album)=>{
+                                    if(err){console.log(err);res.sendStatus(500)}
+                                    else{
+                                        res.sendStatus(200)
+                                    }
+                                })
+                            })
+                        }else{res.sendStatus(401)}
+                    }
+                })
+            }else{res.sendStatus(401)}
+        }else{res.sendStatus(406)}
+    }else{res.sendStatus(406)}
+})
+app.delete("/comment",(req,res)=>{
+    if(req.body.codes&&req.body.id){
+        if(req.body.codes.website&&req.body.codes.login){
+            if(req.body.codes.website==keys.codes.website){
+                models.comment.deleteOne({"_id":req.body.id},(err,comment)=>{
+                    if(err){console.log(err);res.sendStatus(500)}
+                    else{
+                        models.album.findOneAndUpdate({"name":req.body.album},{$pull:{comments:req.body.id}},(err,album)=>{
+                            if(err){console.log(err);res.sendStatus(500)}
+                            else{
+                                res.sendStatus(200)
+                            }
+                        })
+                    }
+                })
+            }else{res.sendStatus(401)}
+        }else{res.sendStatus(406)}
+    }else{res.sendStatus(406)}
+})
+
+// images
+app.get('/images',(req,res)=>{
+    if(req.query.set&&req.query.album&&req.query.code){
+        if(req.query.code==keys.codes.website){
+            models.album.findOne({name:req.query.album,"set.name":req.query.set},(err,album)=>{
+                if(err){res.sendStatus(500)}
+                else if(album){
+                    res.send(album.images)
+                }else{res.sendStatus(404)}
+            })
+        }else{res.sendStatus(401)}
+    }else{res.sendStatus(406)}
+})
+
 // albums
 app.get('/album',(req,res)=>{
     if(req.query.set&&req.query.code){
         if(req.query.code==keys.codes.website){
             models.album.find({"set.name":req.query.set},(err,data)=>{
-                if(err){res.sendStatus(500);console.log(err)} 
+                if(err||!data[0]){res.sendStatus(404)} 
                 else {res.json(data)}
             })
         }else{res.sendStatus(401)}
@@ -142,17 +218,18 @@ app.post('/album',(req,res)=>{
                                             set:{
                                                 _id:_data[0]._id,
                                                 name:req.body.constructor.set.name,
-                                                description:req.body.constructor.set.description,
+                                                description:_data[0].description,
                                             },
                                             comments:[]
+                                        }).then((__data)=>{
+                                            if(err){res.sendStatus(500);console.log(err)}
+                                            else{
+                                                models.set.updateOne({_id:_data[0]._id},{$push:{albums:{_id:__data._id,name:req.body.constructor.name,description:req.body.constructor.description,image:req.body.constructor.image}}},(__data_)=>{
+                                                    if(err){res.sendStatus(500);console.log(err)}
+                                                    else{res.sendStatus(200)}
+                                                })
+                                            }
                                         })
-                                        models.set.updateOne({name:req.body.constructor.set.name},{$push:{albums:{
-                                            _id:req.body.constructor.name,
-                                            name:req.body.constructor.name,
-                                            description:req.body.constructor.description,
-                                            image:req.body.constructor.image,
-                                        }}})
-                                        res.sendStatus(200)
                                     }else{res.sendStatus(404)}
                                 })
                             }else{res.sendStatus(409)}
@@ -205,9 +282,14 @@ app.put('/album',(req,res)=>{
                                 models.set.find({name:req.body.set},(err,_data)=>{
                                     if(err){res.sendStatus(500)}
                                     else{
-                                        models.album.updateOne({_id:data[0]._id},{$set:{description:req.body.constructor.description,image:req.body.constructor.image,images:req.body.constructor.images,name:req.body.constructor.title}},(err)=>{
+                                        models.set.updateOne({_id:_data[0]._id,"albums.name":req.body.constructor.title},{$set:{"albums.$._id":data[0]._id,"albums.$.name":req.body.constructor.title,"albums.$.description":req.body.constructor.description,"albums.$.image":req.body.constructor.image}},(err)=>{
                                             if(err){res.sendStatus(500)}
-                                            else{res.sendStatus(200)}
+                                            else{                                                
+                                                models.album.updateOne({_id:data[0]._id},{$set:{description:req.body.constructor.description,image:req.body.constructor.image,images:req.body.constructor.images,name:req.body.constructor.title}},(err)=>{
+                                                    if(err){res.sendStatus(500)}
+                                                    else{res.sendStatus(200)}
+                                                })
+                                            }
                                         })
                                     }
                                 })

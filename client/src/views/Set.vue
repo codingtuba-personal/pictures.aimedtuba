@@ -31,10 +31,21 @@ export default {
         }
     },
     mounted(){
-        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/album?code=${cookies.getCookie('code')}&set=${this.$route.params.set}`).then(res=>res.json()).then(res=>{
-            console.log(res)
-            this.albums=res
-            this.loading=false
+        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/album?code=${cookies.getCookie('code')}&set=${this.$route.params.set}`).then(res=>{
+            if(!res.ok){
+                swal({
+                    title:"This set doesn't exist",
+                    text:"you will be redirected soon",
+                    icon:'error',
+                    buttons:false,
+                    timer:3000,
+                }).then(()=>location.replace('/'))
+            }else{
+                res.json().then(data=>{
+                    this.albums=data
+                    this.loading=false
+                })
+            }
         }).catch(e=>{
             swal({
                 title:"This set doesn't exist",
@@ -85,7 +96,6 @@ export default {
                                 constructor.images.push({
                                     url:_dummy[0],
                                     name:_dummy[1],
-                                    reactions:[]
                                 })
                             })
                         }
@@ -190,8 +200,15 @@ export default {
                         preConfirm: () => {
                             document.querySelector('.swal2-textarea').value.split('\n').forEach((i,d)=>{
                                 let _dummy=i.replace("]","").split(" [")
-                                constructor.images[d].url=_dummy[0]
-                                constructor.images[d].name=_dummy[1]
+                                try{
+                                    constructor.images[d].url=_dummy[0]
+                                    constructor.images[d].name=_dummy[1]
+                                }catch(e){
+                                    constructor.images.push({
+                                        url:_dummy[0],
+                                        name:_dummy[1],
+                                    })
+                                }
                             })
                             fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/album`,{
                                 method:'PUT',
@@ -271,9 +288,5 @@ export default {
     }
     .album-description{
         color:lightgray;
-    }
-    textarea, .swal2-textarea {
-        white-space: nowrap;  
-        overflow: auto;
     }
 </style>

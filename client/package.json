@@ -10,11 +10,13 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "jszip": "^3.7.1",
     "sweetalert": "^2.1.2",
     "sweetalert2": "^11.3.10",
     "vue": "^2.5.2",
     "vue-mobile-detection": "^2.0.1",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "vue-sweetalert2": "^5.0.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
