@@ -1,3 +1,6 @@
+global.TextEncoder = require("util").TextEncoder;
+global.TextDecoder = require("util").TextDecoder;
+
 const express=require('express')
 const nodemailer=require('nodemailer')
 const keys=require('../keys')
