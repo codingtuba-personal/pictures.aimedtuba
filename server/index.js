@@ -193,7 +193,7 @@ app.get('/album',(req,res)=>{
     if(req.query.set&&req.query.code){
         if(req.query.code==keys.codes.website){
             models.album.find({"set.name":req.query.set},(err,data)=>{
-                if(err||!data[0]){res.sendStatus(404)} 
+                if(err){res.sendStatus(404)} 
                 else {res.json(data)}
             })
         }else{res.sendStatus(401)}
@@ -226,7 +226,33 @@ app.post('/album',(req,res)=>{
                                             else{
                                                 models.set.updateOne({_id:_data[0]._id},{$push:{albums:{_id:__data._id,name:req.body.constructor.name,description:req.body.constructor.description,image:req.body.constructor.image}}},(__data_)=>{
                                                     if(err){res.sendStatus(500);console.log(err)}
-                                                    else{res.sendStatus(200)}
+                                                    else{
+                                                        res.sendStatus(200)
+                                                        models.user.find({"settings.albums.created":true},(err,users)=>{
+                                                            let emails=users.map(user=>user.email).join(",")
+                                                            console.log(emails)
+                                                            nodemailer.createTransport({
+                                                                secure: true,
+                                                                host: 'pictures.aimedtuba.com',
+                                                                port: 465,
+                                                                auth:{
+                                                                    user: keys.email.username,
+                                                                    pass: keys.email.passcode
+                                                                }
+                                                            }).sendMail({
+                                                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                                                to: emails,
+                                                                subject: 'New album created',
+                                                                html:`
+                                                                    <h1>New album created named "<b>${req.body.constructor.name}</b>"</h1>
+                                                                    <a>Description: <b>${req.body.constructor.description}</b></a><br>
+                                                                    <a>Set: <b>${req.body.set}</b></a><br>
+                                                                    <a>Images: <b>${req.body.constructor.images.length}</b></a><br>
+                                                                    <h3>You can view it here at <a href="http://pictures.aimedtuba.com/@/${req.body.set}/${req.body.constructor.name}" target="_blank">http://pictures.aimedtuba.com/@/${req.body.set}/${req.body.constructor.name}</a></h3>
+                                                                `
+                                                            })
+                                                        })
+                                                    }
                                                 })
                                             }
                                         })
@@ -251,15 +277,40 @@ app.delete('/album',(req, res) => {
                                 if(err){res.sendStatus(500)}
                                 else{
                                     if(_data.length>0){
-                                        models.set.updateOne({_id:_data[0]._id},{$pull:{albums:{_id:data[0]._id}}},(err)=>{
-                                            if(err){res.sendStatus(500)}
-                                            else{
-                                                models.album.deleteOne({_id:data[0]._id},(err)=>{
-                                                    if(err){res.sendStatus(500)}
-                                                    else{res.sendStatus(200)}
-                                                })
-                                            }
+                                        models.user.find({"settings.albums.deleted":true},(err,users)=>{
+                                            let emails=users.map(user=>user.email).join(",")
+                                            console.log(emails)
+                                            nodemailer.createTransport({
+                                                secure: true,
+                                                host: 'pictures.aimedtuba.com',
+                                                port: 465,
+                                                auth:{
+                                                    user: keys.email.username,
+                                                    pass: keys.email.passcode
+                                                }
+                                            }).sendMail({
+                                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                                to: emails,
+                                                subject: '!! Album deleting in 48 hours !!',
+                                                html:`
+                                                    <h1>The album named "<b>${req.body.name}</b>" will be deleted in 48 hours</h1>
+                                                    <a>Description: <b>${data[0].description}</b></a><br>
+                                                    <a>Set: <b>${req.body.set}</b></a><br>
+                                                    <a>Images: <b>${data[0].images.length}</b></a><br>
+                                                    <h3>You can download it here at <a href="http://pictures.aimedtuba.com/@/${req.body.set}/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/@/${req.body.set}/${req.body.name}</a></h3>
+                                                    <h3>You can watch the support video on how to download albums here at <a href="http://pictures.aimedtuba.com/support">http://pictures.aimedtuba.com/support</a></h3>
+                                                `
+                                            })
                                         })
+                                        res.sendStatus(200)
+                                        setTimeout(()=>{
+                                            console.log("deleting")
+                                            models.album.deleteOne({name:req.body.name,"set.name":req.body.set},(err)=>{
+                                                models.set.updateOne({_id:_data[0]._id},{$pull:{albums:{name:req.body.name}}},(err)=>{
+                                                
+                                                })
+                                            })
+                                        },1000 /* 1000*60*48 */)
                                     }else{res.sendStatus(404)}
                                 }
                             })
@@ -282,12 +333,50 @@ app.put('/album',(req,res)=>{
                                 models.set.find({name:req.body.set},(err,_data)=>{
                                     if(err){res.sendStatus(500)}
                                     else{
-                                        models.set.updateOne({_id:_data[0]._id,"albums.name":req.body.constructor.title},{$set:{"albums.$._id":data[0]._id,"albums.$.name":req.body.constructor.title,"albums.$.description":req.body.constructor.description,"albums.$.image":req.body.constructor.image}},(err)=>{
+                                        models.user.find({"settings.albums.deleted":true},(err,users)=>{
+                                            let emails=users.map(user=>user.email).join(",")
+                                            console.log(emails)
+                                            nodemailer.createTransport({
+                                                secure: true,
+                                                host: 'pictures.aimedtuba.com',
+                                                port: 465,
+                                                auth:{
+                                                    user: keys.email.username,
+                                                    pass: keys.email.passcode
+                                                }
+                                            }).sendMail({
+                                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                                to: emails,
+                                                subject: 'Album updated',
+                                                html:`
+                                                    <h1>The album named "<b>${req.body.name}</b>" has been updated</h1>
+                                                    <a>New description: <b>${req.body.constructor.description}</b></a><br>
+                                                    <a>New title: <b>${req.body.constructor.title}</b></a><br>
+                                                    <a>New images: <b>${req.body.constructor.images.length}</b></a><br>
+                                                    <h3>You can view it here at <a href="http://pictures.aimedtuba.com/@/${req.body.set}/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/@/${req.body.set}/${req.body.name}</a></h3>
+                                                `
+                                            })
+                                        })
+                                        models.set.findOne({name:req.body.set},(err,__data)=>{
                                             if(err){res.sendStatus(500)}
-                                            else{                                                
-                                                models.album.updateOne({_id:data[0]._id},{$set:{description:req.body.constructor.description,image:req.body.constructor.image,images:req.body.constructor.images,name:req.body.constructor.title}},(err)=>{
+                                            else{
+                                                __data.albums.forEach(album=>{
+                                                    if(album.name==req.body.name){
+                                                        album.description=req.body.constructor.description
+                                                        album.name=req.body.constructor.title
+                                                        album.image=req.body.constructor.image
+                                                    }
+                                                })
+                                                models.set.updateOne({name:req.body.set},{$set:{albums:__data.albums}},(err)=>{
                                                     if(err){res.sendStatus(500)}
-                                                    else{res.sendStatus(200)}
+                                                    else{                                                
+                                                        models.album.updateOne({_id:data[0]._id},{$set:{description:req.body.constructor.description,image:req.body.constructor.image,images:req.body.constructor.images,name:req.body.constructor.title}},(err)=>{
+                                                            if(err){res.sendStatus(500)}
+                                                            else{
+                                                                res.sendStatus(200)
+                                                            }
+                                                        })
+                                                    }
                                                 })
                                             }
                                         })
@@ -326,6 +415,29 @@ app.post('/sets',(req,res)=>{
                             image:req.body.image
                         })
                         set.save()
+                        models.user.find({"settings.sets.created":true},(err,users)=>{
+                            let emails=users.map(user=>user.email).join(",")
+                            console.log(emails)
+                            nodemailer.createTransport({
+                                secure: true,
+                                host: 'pictures.aimedtuba.com',
+                                port: 465,
+                                auth:{
+                                    user: keys.email.username,
+                                    pass: keys.email.passcode
+                                }
+                            }).sendMail({
+                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                to: emails,
+                                subject: 'New set',
+                                html:`
+                                    <h1>The set named "<b>${req.body.title}</b>" has been created</h1>
+                                    <a>Description: <b>${req.body.description}</b></a><br>
+                                    <a>Cover Image: <b><a href="${req.body.image}">${req.body.image}</a></b></a><br>
+                                    <h3>You can view it here at <a href="http://pictures.aimedtuba.com/@/${req.body.title}" target="_blank">http://pictures.aimedtuba.com/@/${req.body.title}</a></h3>
+                                `
+                            })
+                        })
                         res.sendStatus(200)
                     }else{res.sendStatus(409)}
                 })
@@ -341,6 +453,30 @@ app.put('/sets',(req,res)=>{
                 models.set.findOneAndUpdate({name:req.body.title},{$set:{description:req.body.description,image:req.body.image,name:req.body.name}},(err,data)=>{
                     if(err) throw err
                     if(data){
+                        models.user.find({"settings.sets.updated":true},(err,users)=>{
+                            let emails=users.map(user=>user.email).join(",")
+                            console.log(emails)
+                            nodemailer.createTransport({
+                                secure: true,
+                                host: 'pictures.aimedtuba.com',
+                                port: 465,
+                                auth:{
+                                    user: keys.email.username,
+                                    pass: keys.email.passcode
+                                }
+                            }).sendMail({
+                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                to: emails,
+                                subject: 'Set updated',
+                                html:`
+                                    <h1>The set named "<b>${req.body.title}</b>" has been updated</h1>
+                                    <a>New Description: <b>${req.body.description}</b></a><br>
+                                    <a>New Cover Image: <b><a href="${req.body.image}">${req.body.image}</a></b></a><br>
+                                    <a>New Name: <b>${req.body.name}</b></a><br>
+                                    <h3>You can view it here at <a href="http://pictures.aimedtuba.com/@/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/@/${req.body.name}</a></h3>
+                                `
+                            })
+                        })
                         res.sendStatus(200)
                     }else{res.sendStatus(404)}
                 })
@@ -351,10 +487,34 @@ app.put('/sets',(req,res)=>{
 app.delete('/sets',(req,res)=>{
     if(req.body.code&&req.body.admin&&req.body.title){
         if(req.body.code==keys.codes.website&&req.body.admin==keys.codes.admin){
-            models.set.findOneAndDelete({name:req.body.title},(err,data)=>{
-                if(err) throw err
-                res.sendStatus(200)
+            res.sendStatus(200)
+            models.user.find({"settings.sets.deleted":true},(err,users)=>{
+                let emails=users.map(user=>user.email).join(",")
+                console.log(emails)
+                nodemailer.createTransport({
+                    secure: true,
+                    host: 'pictures.aimedtuba.com',
+                    port: 465,
+                    auth:{
+                        user: keys.email.username,
+                        pass: keys.email.passcode
+                    }
+                }).sendMail({
+                    from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                    to: emails,
+                    subject: '!! Set deleting in 48 hours !!',
+                    html:`
+                        <h1>The set named "<b>${req.body.title}</b>" will be deleted in 48 hours, along with all its albums.</h1>
+                        <h3>You can download the albums here at <a href="http://pictures.aimedtuba.com/@/${req.body.title}" target="_blank">http://pictures.aimedtuba.com/@/${req.body.title}</a></h3>
+                        <h3>You can watch the support video on how to download albums here at <a href="http://pictures.aimedtuba.com/support">http://pictures.aimedtuba.com/support</a></h3>
+                    `
+                })
             })
+            setTimeout(()=>{
+                models.set.findOneAndDelete({name:req.body.title},(err,data)=>{
+                    if(err) throw err
+                })
+            },1000 /* 1000*60*48 */)
         }else{res.sendStatus(401)}
     }else{res.sendStatus(406)}
 })
