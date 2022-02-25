@@ -234,26 +234,28 @@ app.post('/album',(req,res)=>{
                                                         models.user.find({"settings.albums.created":true},(err,users)=>{
                                                             let emails=users.map(user=>user.email).join(",")
                                                             console.log(emails)
-                                                            nodemailer.createTransport({
-                                                                secure: true,
-                                                                host: 'pictures.aimedtuba.com',
-                                                                port: 465,
-                                                                auth:{
-                                                                    user: keys.email.username,
-                                                                    pass: keys.email.passcode
-                                                                }
-                                                            }).sendMail({
-                                                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
-                                                                to: emails,
-                                                                subject: 'New album created',
-                                                                html:`
-                                                                    <h1>New album created named "<b>${req.body.constructor.name}</b>"</h1>
-                                                                    <a>Description: <b>${req.body.constructor.description}</b></a><br>
-                                                                    <a>Set: <b>${req.body.set}</b></a><br>
-                                                                    <a>Images: <b>${req.body.constructor.images.length}</b></a><br>
-                                                                    <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/?r=/@/${req.body.set}/${req.body.constructor.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.constructor.name}</a></h3>
-                                                                `
-                                                            })
+                                                            if(emails!=null&&emails!=""){
+                                                                nodemailer.createTransport({
+                                                                    secure: true,
+                                                                    host: 'pictures.aimedtuba.com',
+                                                                    port: 465,
+                                                                    auth:{
+                                                                        user: keys.email.username,
+                                                                        pass: keys.email.passcode
+                                                                    }
+                                                                }).sendMail({
+                                                                    from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                                                    to: emails,
+                                                                    subject: 'New album created',
+                                                                    html:`
+                                                                        <h1>New album created named "<b>${req.body.constructor.name}</b>"</h1>
+                                                                        <a>Description: <b>${req.body.constructor.description}</b></a><br>
+                                                                        <a>Set: <b>${req.body.set}</b></a><br>
+                                                                        <a>Images: <b>${req.body.constructor.images.length}</b></a><br>
+                                                                        <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/?r=/@/${req.body.set}/${req.body.constructor.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.constructor.name}</a></h3>
+                                                                    `
+                                                                })
+                                                            }
                                                         })
                                                     }
                                                 })
@@ -283,27 +285,29 @@ app.delete('/album',(req, res) => {
                                         models.user.find({"settings.albums.deleted":true},(err,users)=>{
                                             let emails=users.map(user=>user.email).join(",")
                                             console.log(emails)
-                                            nodemailer.createTransport({
-                                                secure: true,
-                                                host: 'pictures.aimedtuba.com',
-                                                port: 465,
-                                                auth:{
-                                                    user: keys.email.username,
-                                                    pass: keys.email.passcode
-                                                }
-                                            }).sendMail({
-                                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
-                                                to: emails,
-                                                subject: '!! Album deleting in 48 hours !!',
-                                                html:`
-                                                    <h1>The album named "<b>${req.body.name}</b>" will be deleted in 48 hours</h1>
-                                                    <a>Description: <b>${data[0].description}</b></a><br>
-                                                    <a>Set: <b>${req.body.set}</b></a><br>
-                                                    <a>Images: <b>${data[0].images.length}</b></a><br>
-                                                    <h3>You can download it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.name}</a></h3>
-                                                    <h3>You can watch the support video on how to download albums here at <a href="http://pictures.aimedtuba.com/?r=/support">http://pictures.aimedtuba.com/?r=/support</a></h3>
-                                                `
-                                            })
+                                            if(emails!=null&&emails!=""){
+                                                nodemailer.createTransport({
+                                                    secure: true,
+                                                    host: 'pictures.aimedtuba.com',
+                                                    port: 465,
+                                                    auth:{
+                                                        user: keys.email.username,
+                                                        pass: keys.email.passcode
+                                                    }
+                                                }).sendMail({
+                                                    from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                                    to: emails,
+                                                    subject: '!! Album deleting in 48 hours !!',
+                                                    html:`
+                                                        <h1>The album named "<b>${req.body.name}</b>" will be deleted in 48 hours</h1>
+                                                        <a>Description: <b>${data[0].description}</b></a><br>
+                                                        <a>Set: <b>${req.body.set}</b></a><br>
+                                                        <a>Images: <b>${data[0].images.length}</b></a><br>
+                                                        <h3>You can download it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.name}</a></h3>
+                                                        <h3>You can watch the support video on how to download albums here at <a href="http://pictures.aimedtuba.com/?r=/support">http://pictures.aimedtuba.com/?r=/support</a></h3>
+                                                    `
+                                                })
+                                            }
                                         })
                                         res.sendStatus(200)
                                         setTimeout(()=>{
@@ -313,7 +317,7 @@ app.delete('/album',(req, res) => {
                                                 
                                                 })
                                             })
-                                        },1000 /* 1000*60*48 */)
+                                        },1000*60*48)
                                     }else{res.sendStatus(404)}
                                 }
                             })
@@ -339,26 +343,28 @@ app.put('/album',(req,res)=>{
                                         models.user.find({"settings.albums.deleted":true},(err,users)=>{
                                             let emails=users.map(user=>user.email).join(",")
                                             console.log(emails)
-                                            nodemailer.createTransport({
-                                                secure: true,
-                                                host: 'pictures.aimedtuba.com',
-                                                port: 465,
-                                                auth:{
-                                                    user: keys.email.username,
-                                                    pass: keys.email.passcode
-                                                }
-                                            }).sendMail({
-                                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
-                                                to: emails,
-                                                subject: 'Album updated',
-                                                html:`
-                                                    <h1>The album named "<b>${req.body.name}</b>" has been updated</h1>
-                                                    <a>New description: <b>${req.body.constructor.description}</b></a><br>
-                                                    <a>New title: <b>${req.body.constructor.title}</b></a><br>
-                                                    <a>New images: <b>${req.body.constructor.images.length}</b></a><br>
-                                                    <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.name}</a></h3>
-                                                `
-                                            })
+                                            if(emails!=null&&emails!=""){
+                                                nodemailer.createTransport({
+                                                    secure: true,
+                                                    host: 'pictures.aimedtuba.com',
+                                                    port: 465,
+                                                    auth:{
+                                                        user: keys.email.username,
+                                                        pass: keys.email.passcode
+                                                    }
+                                                }).sendMail({
+                                                    from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                                    to: emails,
+                                                    subject: 'Album updated',
+                                                    html:`
+                                                        <h1>The album named "<b>${req.body.name}</b>" has been updated</h1>
+                                                        <a>New description: <b>${req.body.constructor.description}</b></a><br>
+                                                        <a>New title: <b>${req.body.constructor.title}</b></a><br>
+                                                        <a>New images: <b>${req.body.constructor.images.length}</b></a><br>
+                                                        <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.name}</a></h3>
+                                                    `
+                                                })
+                                            }
                                         })
                                         models.set.findOne({name:req.body.set},(err,__data)=>{
                                             if(err){res.sendStatus(500)}
@@ -421,25 +427,27 @@ app.post('/sets',(req,res)=>{
                         models.user.find({"settings.sets.created":true},(err,users)=>{
                             let emails=users.map(user=>user.email).join(",")
                             console.log(emails)
-                            nodemailer.createTransport({
-                                secure: true,
-                                host: 'pictures.aimedtuba.com',
-                                port: 465,
-                                auth:{
-                                    user: keys.email.username,
-                                    pass: keys.email.passcode
-                                }
-                            }).sendMail({
-                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
-                                to: emails,
-                                subject: 'New set',
-                                html:`
-                                    <h1>The set named "<b>${req.body.title}</b>" has been created</h1>
-                                    <a>Description: <b>${req.body.description}</b></a><br>
-                                    <a>Cover Image: <b><a href="${req.body.image}">${req.body.image}</a></b></a><br>
-                                    <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.title}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.title}</a></h3>
-                                `
-                            })
+                            if(emails!=null&&emails!=""){
+                                nodemailer.createTransport({
+                                    secure: true,
+                                    host: 'pictures.aimedtuba.com',
+                                    port: 465,
+                                    auth:{
+                                        user: keys.email.username,
+                                        pass: keys.email.passcode
+                                    }
+                                }).sendMail({
+                                    from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                    to: emails,
+                                    subject: 'New set',
+                                    html:`
+                                        <h1>The set named "<b>${req.body.title}</b>" has been created</h1>
+                                        <a>Description: <b>${req.body.description}</b></a><br>
+                                        <a>Cover Image: <b><a href="${req.body.image}">${req.body.image}</a></b></a><br>
+                                        <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.title}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.title}</a></h3>
+                                    `
+                                })
+                            }
                         })
                         res.sendStatus(200)
                     }else{res.sendStatus(409)}
@@ -459,26 +467,28 @@ app.put('/sets',(req,res)=>{
                         models.user.find({"settings.sets.updated":true},(err,users)=>{
                             let emails=users.map(user=>user.email).join(",")
                             console.log(emails)
-                            nodemailer.createTransport({
-                                secure: true,
-                                host: 'pictures.aimedtuba.com',
-                                port: 465,
-                                auth:{
-                                    user: keys.email.username,
-                                    pass: keys.email.passcode
-                                }
-                            }).sendMail({
-                                from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
-                                to: emails,
-                                subject: 'Set updated',
-                                html:`
-                                    <h1>The set named "<b>${req.body.title}</b>" has been updated</h1>
-                                    <a>New Description: <b>${req.body.description}</b></a><br>
-                                    <a>New Cover Image: <b><a href="${req.body.image}">${req.body.image}</a></b></a><br>
-                                    <a>New Name: <b>${req.body.name}</b></a><br>
-                                    <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.name}</a></h3>
-                                `
-                            })
+                            if(emails!=null&&emails!=""){
+                                nodemailer.createTransport({
+                                    secure: true,
+                                    host: 'pictures.aimedtuba.com',
+                                    port: 465,
+                                    auth:{
+                                        user: keys.email.username,
+                                        pass: keys.email.passcode
+                                    }
+                                }).sendMail({
+                                    from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                                    to: emails,
+                                    subject: 'Set updated',
+                                    html:`
+                                        <h1>The set named "<b>${req.body.title}</b>" has been updated</h1>
+                                        <a>New Description: <b>${req.body.description}</b></a><br>
+                                        <a>New Cover Image: <b><a href="${req.body.image}">${req.body.image}</a></b></a><br>
+                                        <a>New Name: <b>${req.body.name}</b></a><br>
+                                        <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.name}</a></h3>
+                                    `
+                                })
+                            }
                         })
                         res.sendStatus(200)
                     }else{res.sendStatus(404)}
@@ -494,30 +504,32 @@ app.delete('/sets',(req,res)=>{
             models.user.find({"settings.sets.deleted":true},(err,users)=>{
                 let emails=users.map(user=>user.email).join(",")
                 console.log(emails)
-                nodemailer.createTransport({
-                    secure: true,
-                    host: 'pictures.aimedtuba.com',
-                    port: 465,
-                    auth:{
-                        user: keys.email.username,
-                        pass: keys.email.passcode
-                    }
-                }).sendMail({
-                    from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
-                    to: emails,
-                    subject: '!! Set deleting in 48 hours !!',
-                    html:`
-                        <h1>The set named "<b>${req.body.title}</b>" will be deleted in 48 hours, along with all its albums.</h1>
-                        <h3>You can download the albums here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.title}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.title}</a></h3>
-                        <h3>You can watch the support video on how to download albums here at <a href="http://pictures.aimedtuba.com/?r=/support">http://pictures.aimedtuba.com/?r=/support</a></h3>
-                    `
-                })
+                if(emails!=null&&emails!=""){
+                    nodemailer.createTransport({
+                        secure: true,
+                        host: 'pictures.aimedtuba.com',
+                        port: 465,
+                        auth:{
+                            user: keys.email.username,
+                            pass: keys.email.passcode
+                        }
+                    }).sendMail({
+                        from: '"pictures.aimedtuba.com notification" '+keys.email.username+'',
+                        to: emails,
+                        subject: '!! Set deleting in 48 hours !!',
+                        html:`
+                            <h1>The set named "<b>${req.body.title}</b>" will be deleted in 48 hours, along with all its albums.</h1>
+                            <h3>You can download the albums here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.title}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.title}</a></h3>
+                            <h3>You can watch the support video on how to download albums here at <a href="http://pictures.aimedtuba.com/?r=/support">http://pictures.aimedtuba.com/?r=/support</a></h3>
+                        `
+                    })
+                }
             })
             setTimeout(()=>{
                 models.set.findOneAndDelete({name:req.body.title},(err,data)=>{
                     if(err) throw err
                 })
-            },1000 /* 1000*60*48 */)
+            },1000*60*48)
         }else{res.sendStatus(401)}
     }else{res.sendStatus(406)}
 })
