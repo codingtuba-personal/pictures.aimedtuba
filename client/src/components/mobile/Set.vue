@@ -1,29 +1,29 @@
 <template>
   <div class="mobile mobile-table">
-    <div class="mobile mobile-table-cell up arrow-nav nav-style" @click="nav(-1)">⬆</div>
+    <div class="mobile mobile-table-cell nav-up arrow-nav nav-style" @click="nav(-1)">⬆</div>
     <div class="mobile mobile-table-cell set" @click="album=!album">
       <div class="set-show-content">
         <div class="loading-set-show" v-if="loading"><a class="loading-set-show-text">battling images 🏰⚔️<br></a></div>
         <img :src="sets[current].image" v-show="!loading" @load="loading=false" class="image-set image-style"><br><br>
-        <a class="set-name" style="color:rgb(180, 180, 180);font-size:18px">{{sets[current].name}}</a>
+        <a class="set-name" style="color:rgb(180, 180, 180);font-size:18px">{{sets[current].name}} </a>
         <a class="set-description" style="color:lightgray">{{sets[current].description}} ({{sets[current].albums.length}} album(s))</a><br><br>
       </div>
     </div>
     <span v-if="album">
-      <a v-for="(album,index) in sets[current].albums" :key="album.name" :href="'/@/'+sets[current].name+'/'+album.name" style="text-decoration:none;">
+      <router-link tag="a" v-for="(album,index) in sets[current].albums" :key="album.name" :to="'/@/'+sets[current].name+'/'+album.name" style="text-decoration:none;">
         <div class="mobile mobile-table-cell album">
           <div class="album-show-content">
             <div class="loading-album-show" v-if="album_images_loading[index]"><a class="loading-album-show-text">battling images 🏰⚔️<br></a></div>
             <img :src="album.image" v-show="!album_images_loading[index]" @load="load(index)" class="image-album image-style"><br><br>
             <div>            
-              <a class="album-name" style="color:rgb(180, 180, 180);font-size:18px">{{album.name}}</a>
+              <a class="album-name" style="color:rgb(180, 180, 180);font-size:18px">{{album.name}} </a>
               <a class="album-description" style="color:lightgray">{{album.description}}</a><br><br>
             </div>
           </div>
         </div>
-      </a>
+      </router-link>
     </span>
-    <div class="mobile mobile-table-cell no-border-bottom down arrow-nav nav-style" @click="nav(1)">⬇</div>
+    <div class="mobile mobile-table-cell no-border-bottom nav-down arrow-nav nav-style" @click="nav(1)">⬇</div>
   </div>
 </template>
 

@@ -1,14 +1,14 @@
 <template>
-    <a :href="'/@/'+_set+'/'+album.name" style="text-decoration:none;">    
+    <router-link tag="a" :to="'/@/'+_set+'/'+album.name" style="text-decoration:none;">    
       <div class="album-show" :style="{'float':index==0?'left':'none','display':index!=0?'inline-block':'inline'}">
         <div class="album-main" :style="{'float':index==0?'left':'none','display':index!=0?'inline-block':'inline','min-height':index==0?'calc(50vh - 5.4px)':'calc(50vh - 9.7px)'}">
             <div class="loading-album-show" v-if="loading"><a class="loading-album-show-text">battling images 🏰⚔️<br></a></div>
             <img :src="album.image" style="width:300px;" v-show="!loading" @load="loading=false"><br>
-            <b class="album-name">{{album.name}}</b>
+            <b class="album-name">{{album.name}} </b>
             <a class="album-description">{{album.description}}</a>
         </div>
       </div>
-    </a>
+    </router-link>
 </template>
 
 <script>

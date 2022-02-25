@@ -7,10 +7,10 @@
           <tbody>
             <tr v-for="(album,index) in albums" class="album" :key="album.name" :style="{'width':'100%','overflow-x':'auto','word-break':'break-all','background-color':index/2%1===0?'white':'lightgray'}">
                 <td>
-                    <a :href="'/@/'+$route.params.set+'/'+album.name" style="text-decoration:none;">
+                    <router-link tag="a" :to="'/@/'+$route.params.set+'/'+album.name" style="text-decoration:none;">
                         <b class="album-title roboto-sans-serif" :style="{'color':index/2%1!==0?'white':'lightgray','text-decoration':'none'}">{{album.name}} </b>
                         <a class="album-description roboto-sans-serif" :style="{'color':index/2%1!==0?'white':'lightgray','text-decoration':'none'}">{{album.description}} </a>
-                    </a>
+                    </router-link>
                 </td>
             </tr>
           </tbody>
@@ -31,7 +31,7 @@ export default {
         }
     },
     mounted(){
-        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/album?code=${cookies.getCookie('code')}&set=${this.$route.params.set}`).then(res=>{
+        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/album?code=${cookies.getCookie('code')}&set=${this.$route.params.set}`).then(res=>{
             if(!res.ok){
                 swal({
                     title:"This set doesn't exist",
@@ -39,7 +39,7 @@ export default {
                     icon:'error',
                     buttons:false,
                     timer:3000,
-                }).then(()=>location.replace('/'))
+                }).then(()=>this.$router.push("/"))
             }else{
                 res.json().then(data=>{
                     this.albums=data
@@ -53,7 +53,7 @@ export default {
                 icon:'error',
                 buttons:false,
                 timer:3000,
-            }).then(()=>location.replace('/'))
+            }).then(()=>this.$router.push("/"))
         })
     },
     methods: {
@@ -100,7 +100,7 @@ export default {
                             })
                         }
                     }).then(()=>{
-                        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/album`,{
+                        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/album`,{
                             method:'POST',
                             headers:{
                                 'Content-Type':'application/json'
@@ -120,7 +120,7 @@ export default {
                                 icon:'success',
                                 buttons:false,
                                 timer:3000,
-                            }).then(()=>location.replace(`/@/${this.$route.params.set}/${constructor.name}`))
+                            }).then(()=>this.$router.push(`/@/${this.$route.params.set}/${constructor.name}`))
                         })
                     })
                 }
@@ -157,7 +157,7 @@ export default {
                         }
                     }).then(going=>{
                         if(going.isConfirmed){
-                            fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/album`,{
+                            fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/album`,{
                                 method:'PUT',
                                 headers:{
                                     'Content-Type':'application/json'
@@ -178,7 +178,7 @@ export default {
                                     icon:'success',
                                     buttons:false,
                                     timer:3000,
-                                }).then(()=>location.reload())
+                                }).then(()=>this.$router.push(location.pathname))
                             })
                         }
                     })
@@ -210,7 +210,7 @@ export default {
                                     })
                                 }
                             })
-                            fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/album`,{
+                            fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/album`,{
                                 method:'PUT',
                                 headers:{
                                     'Content-Type':'application/json'
@@ -231,7 +231,7 @@ export default {
                                     icon:'success',
                                     buttons:false,
                                     timer:3000,
-                                }).then(()=>location.reload())
+                                }).then(()=>this.$router.push(location.pathname))
                             })
                         }
                     })
@@ -249,7 +249,7 @@ export default {
                 allowEscapeKey:false,
             }).then(willDelete => {
                 if (willDelete) {
-                    fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/album`,{
+                    fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/album`,{
                         method:'DELETE',
                         headers:{
                             'Content-Type':'application/json'
@@ -269,7 +269,7 @@ export default {
                             icon:'success',
                             buttons:false,
                             timer:3000,
-                        }).then(()=>location.replace(`/@/${this.$route.params.set}`))
+                        }).then(()=>this.$router.push(`/@/${this.$route.params.set}`))
                     })
                 }
             })

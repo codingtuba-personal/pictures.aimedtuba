@@ -51,7 +51,7 @@ export default {
         `,
         focusConfirm: false,
         preConfirm: () => {
-          fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/sets`,{
+          fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/sets`,{
             method:'PUT',
             headers:{
               'Content-Type':'application/json',
@@ -69,7 +69,7 @@ export default {
               title: 'Success',
               text: 'Set edited',
               icon: 'success',
-            }).then(()=>location.reload())
+            }).then(()=>this.$router.push(location.pathname))
           })
         },
       })
@@ -84,7 +84,7 @@ export default {
         dangerMode:true,
       }).then(_delete=>{
         if(_delete==true){
-          fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/sets`,{
+          fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/sets`,{
             method:'DELETE',
             headers:{
               'Content-Type':'application/json'
@@ -100,7 +100,7 @@ export default {
               text:"Your set has been deleted.",
               icon:"success",
             }).then(_=>{
-              location.reload()
+              this.$router.push(location.pathname)
             })
           })
         }
@@ -120,7 +120,7 @@ export default {
         `,
         focusConfirm: false,
         preConfirm:()=>{
-          fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/sets`,{
+          fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/sets`,{
             method:"POST",
             headers:{
               "Content-Type":"application/json"
@@ -140,7 +140,7 @@ export default {
               text:"Your set has been created",
               icon:"success",
             }).then(()=>{
-              window.location.reload()
+              this.$router.push(location.pathname)
             })
           })
         }
@@ -148,7 +148,7 @@ export default {
     }
   },
   mounted(){
-    fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/sets?code=${cookies.getCookie('code')}`)
+    fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/sets?code=${cookies.getCookie('code')}`)
     .then(r=>r.json()).then(res=>{
       this.sets=res
       this.loading=false

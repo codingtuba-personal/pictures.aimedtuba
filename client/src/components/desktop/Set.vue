@@ -4,7 +4,7 @@
       <div class="set-main">
         <div class="loading-set-show" v-if="loading"><a class="loading-set-show-text">battling images 🏰⚔️<br></a></div>
         <img :src="set.image" style="width:300px;" v-show="!loading" @load="loading=false">
-        <a class="set-name">{{set.name}}</a>
+        <a class="set-name">{{set.name}} </a>
         <a class="set-description">{{set.description}} ({{set.albums.length}} album(s))</a>
       </div>
     </div>
@@ -35,7 +35,7 @@ export default {
       this.album=!this.album
     },
     _set(){
-      location=`/@/${this.set.name}`
+      this.$router.push(`/@/${this.set.name}`)
     }
   },
   components:{

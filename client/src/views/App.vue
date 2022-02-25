@@ -92,13 +92,16 @@ export default {
     }
   },
   mounted() {
+    if(!!new URLSearchParams(window.location.search).get('r')){
+      this.$router.push(new URLSearchParams(window.location.search).get('r'))
+    }
     if(!!new URLSearchParams(window.location.search).get('code')){
       cookies.setCookie('code',new URLSearchParams(window.location.search).get('code'),99999);
-      location.replace(window.location.pathname)
+      this.$router.push(window.location.pathname)
     }
     if(!!new URLSearchParams(window.location.search).get('tuba-login')){
       let _tuba=new URLSearchParams(window.location.search)
-      fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/user`,{
+      fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/user`,{
         method:'POST',
         headers:{
           'Content-Type':'application/json',
@@ -112,10 +115,10 @@ export default {
       }).then(()=>{
         cookies.setCookie('account',_tuba.get('tuba-login'),99999);
         cookies.setCookie('username',_tuba.get('tuba-username'),99999);
-        location.replace(window.location.pathname)
+        this.$router.push(window.location.pathname)
       })
-    }else if(!cookies.getCookie('account')){
-      location.replace(`https://accounts.aimedtuba.com/login?@redirect=v2:http://${location.hostname}:${location.port}${location.pathname}&$params=tuba-login,tuba-username,tuba-email&$tuba-login=$login&$tuba-username=$username&$tuba-email=$email`)
+    }else if((!!cookies.getCookie('code'))&&!cookies.getCookie('account')){
+      location=`https://accounts.aimedtuba.com/login?@redirect=v2:http://${location.hostname}:${location.port}${location.pathname}&$params=tuba-login,tuba-username,tuba-email&$tuba-login=$login&$tuba-username=$username&$tuba-email=$email`
     }
   },
   methods:{

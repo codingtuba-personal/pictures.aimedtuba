@@ -31,7 +31,7 @@ export default {
         }
     },
     mounted(){
-        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/images?code=${cookies.getCookie('code')}&set=${this.$route.params.set}&album=${this.$route.params.album}`).then(r=>{
+        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/images?code=${cookies.getCookie('code')}&set=${this.$route.params.set}&album=${this.$route.params.album}`).then(r=>{
             if(!r.ok){
                 swal({
                     title:"This album doesn't exist",

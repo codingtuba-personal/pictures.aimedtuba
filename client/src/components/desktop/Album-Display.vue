@@ -202,7 +202,7 @@ export default {
                 }).then((result) => {
                     if (result.value) {
                         content=result.value;
-                        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/comment`,{
+                        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/comment`,{
                             method:"POST",
                             headers:{
                                 "Content-Type":"application/json"
@@ -220,7 +220,7 @@ export default {
                             if(res.success){
                                 this.comments.push(res.comment);
                                 this.comment = "";
-                                location.reload()
+                                this.$router.push(location.pathname)
                             }
                         })
                     }
@@ -311,7 +311,7 @@ export default {
                 if(result.value){
                     this.alert("deleting comments...")
                     i.forEach(async (_i,d)=>{
-                        await fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/comment`,{
+                        await fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/comment`,{
                             method:"DELETE",
                             headers:{
                                 "Content-Type":"application/json"
@@ -372,7 +372,7 @@ export default {
         this.current=localStorage.getItem("current")-0;
         this.options_=JSON.parse(localStorage.getItem("options"))
         this.calbraite_gallery()
-        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/comments?code=${cookies.getCookie('code')}&set=${this.$route.params.set}&album=${this.$route.params.album}`).then(r=>r.json()).then(response=>{
+        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/comments?code=${cookies.getCookie('code')}&set=${this.$route.params.set}&album=${this.$route.params.album}`).then(r=>r.json()).then(response=>{
             this.comments=response
         })
         setInterval(()=>{console.log((!this.loading_gallery[0])&&(!this.loading_gallery[1])&&(!this.loading_gallery[2])&&(!this.loading_gallery[3])&&(!this.loading_gallery[4])&&(!this.loading_gallery[5])&&(!this.loading_gallery[6]))},100)

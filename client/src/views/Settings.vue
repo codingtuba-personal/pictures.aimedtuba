@@ -50,7 +50,7 @@ export default {
         }
     },
     mounted() {
-        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/settings?code=${cookies.getCookie('code')}&login=${cookies.getCookie('account')}`).then(r=>r.json()).then(res=>{
+        fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/settings?code=${cookies.getCookie('code')}&login=${cookies.getCookie('account')}`).then(r=>r.json()).then(res=>{
             this.settings=res
             this.loading=false
             setTimeout(()=>{
@@ -119,7 +119,7 @@ export default {
         update(){
             if(this.allowed==true){
                 this.allowed=false
-                fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/settings`,{
+                fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/settings`,{
                     method:'PUT',
                     headers:{
                         'Content-Type':'application/json',
@@ -135,7 +135,7 @@ export default {
         try_admin(){
             setTimeout(()=>{
                 document.querySelector`.admin-login`.setAttribute("disabled", "disabled")
-                fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.'+location.hostname.replace('www.','')}:${location.port==8080?1000:""}/admin`,{
+                fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/admin`,{
                     method:"POST",
                     headers:{
                         'Content-Type':'application/json',
@@ -154,7 +154,7 @@ export default {
                         setTimeout(()=>{document.querySelector(`.admin-login`).placeholder="reloading in 2..."},1000)
                         setTimeout(()=>{document.querySelector(`.admin-login`).placeholder="reloading in 1..."},2000)
                         setTimeout(()=>{document.querySelector(`.admin-login`).placeholder="reloading in 0..."},3000)
-                        setTimeout(()=>{location.reload()},3100)
+                        setTimeout(()=>{this.$router.push(location.pathname)},3100)
                     }else{
                         document.querySelector(`.admin-login`).classList.add("red-input")
                         document.querySelector(`.admin-login`).classList.remove("green-input")
