@@ -9,7 +9,7 @@
                             <div class="loading" style="display:table;width:100%;height:75vh" v-if="loading">
                                 <a class="loading-text" style="display:table-cell;vertical-align: middle;text-align: center;color: gray;font-family: 'Roboto', sans-serif;">taking image 😏💸</a>
                             </div>
-                            <img :src="this.images[this.current].url" :alt="this.images[this.current].name" class="content image" @load="loading=false" v-show="!loading">
+                            <img :src="this.images[this.current].url" :alt="this.images[this.current].name" class="content image" @load="loading=false" v-show="!loading" v-if="!calbraiting_gallery">
                             <h2 class="content title" v-if="!loading">{{this.images[this.current].name}}</h2>
                         </div>
                     </div>
@@ -41,9 +41,9 @@ import JSZip from "jszip"
 import cookies from '../../cookies'
 import GalleryItem from './Gallery-Item'
 
-if(!localStorage.getItem("current")){
+if((!localStorage.getItem("options-desktop"))||!localStorage.getItem("current")){
     localStorage.setItem("current",0);
-    localStorage.setItem("options",JSON.stringify({gallery:false}));
+    localStorage.setItem("options-desktop",JSON.stringify({gallery:true}));
 }
 
 export default {
@@ -157,7 +157,7 @@ export default {
             },
             o_gallery(){
                 this.options_.gallery = !this.options_.gallery
-                localStorage.setItem("options",JSON.stringify(this.options_));
+                localStorage.setItem("options-desktop",JSON.stringify(this.options_));
             },
             o_load_comments(){
                 let html=`
@@ -280,8 +280,8 @@ export default {
             this.set(localStorage.getItem("current")*1+i);
         },
         set(n){
-            if(n>=this.images.length){n=0}
-            if(n==-1||n<0){n=this.images.length-1}
+            if(n>=this.images.length){n=this.images.length-1}
+            if(n==-1||n<0){n=0}
             localStorage.setItem("current",n);
             this.current=localStorage.getItem("current")-0;
             this.loading=true;
@@ -334,7 +334,9 @@ export default {
             })
         },
         gallery_distance(distance){
-            if(this.images.length+distance<1){distance=this.images.length-distance}
+            if(this.current+distance<1){distance=0}
+            if(this.current+distance>=this.images.length){distance=0}
+            console.log(this.images.length+distance,this.images.length,this.current+distance)
             return JSON.stringify(this.images[this.current+distance])
         },
         calbraite_gallery(){
@@ -351,7 +353,7 @@ export default {
     },
     data(){
         return {
-            options_:{gallery:false},
+            options_:{gallery:true},
             current:0,
             images:[],
             loading:true,
@@ -370,7 +372,7 @@ export default {
     mounted(){
         this.images=JSON.parse(this._images);
         this.current=localStorage.getItem("current")-0;
-        this.options_=JSON.parse(localStorage.getItem("options"))
+        this.options_=JSON.parse(localStorage.getItem("options-desktop"))
         this.calbraite_gallery()
         fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/comments?code=${cookies.getCookie('code')}&set=${this.$route.params.set}&album=${this.$route.params.album}`).then(r=>r.json()).then(response=>{
             this.comments=response

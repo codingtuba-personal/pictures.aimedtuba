@@ -97,7 +97,7 @@ export default {
     }
     if(!!new URLSearchParams(window.location.search).get('code')){
       cookies.setCookie('code',new URLSearchParams(window.location.search).get('code'),99999);
-      this.$router.push(window.location.pathname)
+      location.replace("/")
     }
     if(!!new URLSearchParams(window.location.search).get('tuba-login')){
       let _tuba=new URLSearchParams(window.location.search)
@@ -115,9 +115,9 @@ export default {
       }).then(()=>{
         cookies.setCookie('account',_tuba.get('tuba-login'),99999);
         cookies.setCookie('username',_tuba.get('tuba-username'),99999);
-        this.$router.push(window.location.pathname)
+        location.replace("/")
       })
-    }else if((!!cookies.getCookie('code'))&&!cookies.getCookie('account')){
+    }else if(!cookies.getCookie('account')){
       location=`https://accounts.aimedtuba.com/login?@redirect=v2:http://${location.hostname}:${location.port}${location.pathname}&$params=tuba-login,tuba-username,tuba-email&$tuba-login=$login&$tuba-username=$username&$tuba-email=$email`
     }
   },

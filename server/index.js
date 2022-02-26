@@ -91,19 +91,16 @@ const databases={
             this.sets=mongoose.connection.db.collection('sets')
             this.comments=mongoose.connection.db.collection('comments')
             this.users=mongoose.connection.db.collection('users')
-            app.use(cors())
-            app.use(function(req, res, next) {
-                res.header("Access-Control-Allow-Origin", "*");
-                res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-                next();
-            });
-            app.use(express.json())
+
             app.listen(1000)
         })
     }
 }
+
 databases.connect()
 
+app.use(cors())
+app.use(express.json())
 
 // admin passcode checker
 app.post('/admin',(req,res)=>{
@@ -565,6 +562,7 @@ app.put('/settings',(req,res)=>{
 
 // Users
 app.post('/user',(req,res)=>{
+    console.log(req.body)
     if(req.body.username&&req.body.login&&req.body.code&&req.body.email){
         if(req.body.code==keys.codes.website){
             models.user.findOne({login:req.body.login},(err,data)=>{
