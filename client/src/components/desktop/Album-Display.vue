@@ -41,11 +41,6 @@ import JSZip from "jszip"
 import cookies from '../../cookies'
 import GalleryItem from './Gallery-Item'
 
-if((!localStorage.getItem("options-desktop"))||!localStorage.getItem("current")){
-    localStorage.setItem("current",0);
-    localStorage.setItem("options-desktop",JSON.stringify({gallery:true}));
-}
-
 export default {
     props:["_images"],
     methods:{
@@ -277,17 +272,17 @@ export default {
             this.$swal({text:" ",timer:1})
         },
         nav(i){
-            this.set(localStorage.getItem("current")*1+i);
+            this.set(localStorage.getItem(this.$route.params.set+this.$route.params.album+"current")*1+i);
         },
         set(n){
             if(n>=this.images.length){n=this.images.length-1}
             if(n==-1||n<0){n=0}
-            localStorage.setItem("current",n);
-            this.current=localStorage.getItem("current")-0;
+            localStorage.setItem(this.$route.params.set+this.$route.params.album+"current",n);
+            this.current=localStorage.getItem(this.$route.params.set+this.$route.params.album+"current")-0;
             this.loading=true;
             this.gallery=true;
             this.calbraite_gallery()
-            console.log(localStorage.getItem("current")*1)
+            console.log(localStorage.getItem(this.$route.params.set+this.$route.params.album+"current")*1)
         },
         alert(text){
             this.$swal({
@@ -370,8 +365,12 @@ export default {
         }
     },
     mounted(){
+        if((!localStorage.getItem("options-desktop"))||!localStorage.getItem(this.$route.params.set+this.$route.params.album+"current")){
+            localStorage.setItem(this.$route.params.set+this.$route.params.album+"current",0);
+            localStorage.setItem("options-desktop",JSON.stringify({gallery:true}));
+        }
         this.images=JSON.parse(this._images);
-        this.current=localStorage.getItem("current")-0;
+        this.current=localStorage.getItem(this.$route.params.set+this.$route.params.album+"current")-0;
         this.options_=JSON.parse(localStorage.getItem("options-desktop"))
         this.calbraite_gallery()
         fetch(`${location.port==8080?"http://":"https://"}${location.port==8080?location.hostname:'pictures-server.aimedtuba.com'}:${location.port==8080?1000:""}/comments?code=${cookies.getCookie('code')}&set=${this.$route.params.set}&album=${this.$route.params.album}`).then(r=>r.json()).then(response=>{

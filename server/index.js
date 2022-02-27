@@ -254,7 +254,7 @@ app.post('/album',(req,res)=>{
                                                                         <a>Description: <b>${req.body.constructor.description}</b></a><br>
                                                                         <a>Set: <b>${req.body.set}</b></a><br>
                                                                         <a>Images: <b>${req.body.constructor.images.length}</b></a><br>
-                                                                        <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/?r=/@/${req.body.set}/${req.body.constructor.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.constructor.name}</a></h3>
+                                                                        <h3>You can view it here at <a href="http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.constructor.name}" target="_blank">http://pictures.aimedtuba.com/?r=/@/${req.body.set}/${req.body.constructor.name}</a></h3>
                                                                     `
                                                                 })
                                                             }
