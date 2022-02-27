@@ -55,11 +55,6 @@ import Gallery from './album/Gallery.vue'
 import Comment from './album/Comment.vue'
 import cookies from '../../cookies'
 
-if(!localStorage.getItem(this.$route.params.set+this.$route.params.album+"current")){
-    localStorage.setItem(this.$route.params.set+this.$route.params.album+"current",0);
-    localStorage.setItem("options",JSON.stringify({gallery:false}));
-}
-
 export default {
   components: { Gallery,Comment },
     props:["_images"],
@@ -321,6 +316,10 @@ export default {
         }
     },
     mounted(){
+        if(!localStorage.getItem(this.$route.params.set+this.$route.params.album+"current")){
+            localStorage.setItem(this.$route.params.set+this.$route.params.album+"current",0);
+            localStorage.setItem("options",JSON.stringify({gallery:false}));
+        }
         this.images=JSON.parse(this._images);
         this.current=localStorage.getItem(this.$route.params.set+this.$route.params.album+"current");
         this.options_=JSON.parse(localStorage.getItem("options"))
